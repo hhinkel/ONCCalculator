@@ -4,8 +4,7 @@ Created on May 5, 2017
 @author: Heidi Hinkel
 '''
 import PySimpleGUI as sg
-import math
-from measurement.measures import Distance, Weight
+from flask import Flask
 from screenValues import ScreenValues
 
 menu_def = [['File', ['Exit']],
@@ -42,25 +41,33 @@ def error(values):
 def callErrorScreen():
     pass
 
-window = sg.Window("ONC Body Value Calculator", layout, default_element_size=(40, 1), grab_anywhere=False)
+app = Flask(__name__)
 
-while True:             # Event Loop
-    event, values = window.Read()
-    if event is "Cancel":
-        break
-    if values[0] is 'Exit':
-        break
-    if values[0] is 'About':
-        callAboutScreen()
-    if error(values) is True:
-        callErrorScreen()
+@app.route('/')
+def window():
+    window = sg.Window("ONC Body Value Calculator", layout, default_element_size=(40, 1), grab_anywhere=False)
+
+    while True:             # Event Loop
+        event, values = window.Read()
+        if event == "Cancel":
+            break
+        if values[0] == 'Exit':
+            break
+        if values[0] == 'About':
+            callAboutScreen()
+        if error(values) is True:
+            callErrorScreen()
     
-    screen = ScreenValues(values)
+        screen = ScreenValues(values)
 
-    window.Element('_CM_').Update(screen.heightCm)
-    window.Element("_KG_").Update(screen.weightKg)
-    window.Element('_BMI_').Update('XX.XX')
-    window.Element("_BSA_").Update("X.XX")
-    window.Element("_CRCL_").Update("X.X")
-    window.Element("_CRCLM_").Update("X.X")
+        window.Element('_CM_').Update(screen.heightCm)
+        window.Element("_KG_").Update(screen.weightKg)
+        window.Element('_BMI_').Update('XX.XX')
+        window.Element("_BSA_").Update("X.XX")
+        window.Element("_CRCL_").Update("X.X")
+        window.Element("_CRCLM_").Update("X.X")
 
+
+if __name__ == '__main__':
+    # window()
+    app.run(host='127.0.0.1', port=8080, debug=True)
